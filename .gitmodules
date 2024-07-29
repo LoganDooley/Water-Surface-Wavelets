@@ -1,0 +1,3 @@
+[submodule "Water-Surface-Wavelets/Water-Surface-Wavelets/Libraries/glm"]
+	path = Water-Surface-Wavelets/Water-Surface-Wavelets/Libraries/glm
+	url = https://github.com/g-truc/glm.git
