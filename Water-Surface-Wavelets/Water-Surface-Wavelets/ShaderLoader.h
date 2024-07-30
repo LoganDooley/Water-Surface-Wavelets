@@ -89,6 +89,7 @@ private:
             file.close();
         }
         else {
+            std::cerr<< "Failed to open shader : "<<filepath<<std::endl;
             throw std::runtime_error(std::string("Failed to open shader: ") + filepath);
         }
 
