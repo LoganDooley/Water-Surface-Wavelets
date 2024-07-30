@@ -1,6 +1,15 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "ShaderLoader.h"
+
+void SetOpenglDefaults() {
+	glClearColor(1.0, 0.5, 0.75, 1.0);
+}
+
+void Render() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
 
 int main() {
 	glfwInit();
@@ -18,6 +27,21 @@ int main() {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+
+	SetOpenglDefaults();
+
+	GLuint profileBufferShader = ShaderLoader::CreateShaderProgram("Shaders/ProfileBuffer.comp");
+
+	while (!glfwWindowShouldClose(window)) {
+		Render();
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	glfwDestroyWindow(window);
+
+	glfwTerminate();
 
 	return 0;
 }
