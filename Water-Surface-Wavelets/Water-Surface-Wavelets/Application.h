@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glad/glad.h>
 #include <memory>
 #include "Window.h"
 
@@ -21,6 +20,7 @@ private:
 	GLuint m_profileBufferTexture;
 	GLuint m_fullscreenQuadVao;
 	GLuint m_textureShader;
+	float m_t;
 
 	std::unique_ptr<Window> m_window;
 };

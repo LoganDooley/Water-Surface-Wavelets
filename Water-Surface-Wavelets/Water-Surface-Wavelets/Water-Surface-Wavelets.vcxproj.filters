@@ -46,10 +46,10 @@
     <None Include="Shaders\ProfileBuffer.comp">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="Texture.vert">
+    <None Include="Shaders\Texture.vert">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="Texture.frag">
+    <None Include="Shaders\Texture.frag">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
