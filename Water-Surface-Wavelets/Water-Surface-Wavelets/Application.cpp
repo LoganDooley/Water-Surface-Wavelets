@@ -60,7 +60,7 @@ void Application::InitializeOpenGL()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 4096, 400, 0, GL_RG,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 4096, 400, 0, GL_RGBA,
 		GL_FLOAT, NULL);
 }
 
@@ -68,8 +68,8 @@ void Application::Update()
 {
 	m_t = glfwGetTime();
 	glUseProgram(m_profileBufferShader);
-	glBindImageTexture(0, m_profileBufferTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RG16F);
-	glUniform1d(1, m_t);
+	glBindImageTexture(0, m_profileBufferTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
+	glUniform1f(1, m_t);
 	glDispatchCompute(4096, 400, 1);
 	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }

@@ -2,16 +2,80 @@
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-layout(rg16f, binding = 0) uniform image2D imgOutput;
+layout(rgba16f, binding = 0) uniform image2D imgOutput;
 
-layout(location = 1) uniform double t;
+layout(location = 1) uniform float t;
+
+const int resolution = 4096;
+const int periodicity = 2;
+const int integrationNodes = 100;
+const float tau = 6.28318530718;
+const float windSpeed = 100;
+const float globalZMin = 10;
+const float globalZMax = 0.01;
+const int zResolution = 400;
+const float globalDz = (globalZMax - globalZMin) / zResolution;
+
+float spectrum(float z){
+    float a = pow(1.1, 1.5 * z);
+    float b = exp(-1.8038897788 * pow(4, z) / pow(windSpeed, 4));
+    return float(0.139098 * sqrt(a * b));
+}
+
+float cubicBump(float x){
+    if(abs(x) >= 1){
+        return 0;
+    }
+    return x * x * (2 * abs(x) - 3) + 1;
+}
+
+float dispersionRelation(float k){
+    return sqrt(k * 9.81);
+}
+
+vec4 gerstnerWave(float phase, float knum){
+    float s = sin(phase);
+    float c = cos(phase);
+    return vec4(-s, c, -knum * c, -knum * s);
+}
+
+vec4 f(float z, float p, float period){
+    float waveLength = pow(2, z);
+    float waveNumber = tau / waveLength;
+    float phase1 = waveNumber * p - dispersionRelation(waveNumber) * t;
+    float phase2 = waveNumber * (p - period) - dispersionRelation(waveNumber) * t;
+    float weight1 = p / period;
+    float weight2 = 1 - weight1;
+
+    return waveLength * spectrum(z) * 
+        (cubicBump(weight1) * gerstnerWave(phase1, waveNumber) +
+        cubicBump(weight2) * gerstnerWave(phase2, waveNumber));
+}
+
+vec4 integrate(int i, float z_min, float z_max){\
+    float period = periodicity * pow(2, z_max);
+    float p = (i * period) / resolution;
+    float dz = (z_max - z_min) / integrationNodes;
+    float z = z_min + 0.5 * dz;
+    vec4 result = dz * f(z, p, period);
+    for(int j = 1; j < integrationNodes; j++){
+        z += dz;
+        result += dz * f(z, p, period);
+    }
+    return result;
+}
+
+float idxToPos(int idx){
+    return globalZMin + (idx + 0.5) * globalDz;
+}
 
 void main() {
     vec4 value = vec4(0.0, 0.0, 0.0, 1.0);
     ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
-	
-    value.x = sin(float(texelCoord.x)/(gl_NumWorkGroups.x) + float(4 * t));
-    value.y = cos(float(texelCoord.y)/(gl_NumWorkGroups.y) + float(4 * t));
-	
+	int i = texelCoord.x;
+    int j = texelCoord.y;
+    float z_min = idxToPos(j) - 0.5 * globalDz;
+    float z_max = idxToPos(j) + 0.5 * globalDz;
+    value = integrate(i, z_min, z_max);
     imageStore(imgOutput, texelCoord, value);
 }
